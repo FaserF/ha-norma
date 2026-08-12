@@ -55,8 +55,14 @@ class NormaBaseBinaryEntity(
         self._key = key
         self._attr_unique_id = f"{entry.entry_id}_{key}"
 
-        store_name = str(entry.data.get("store_name") or entry.data.get("store_id") or "Filiale")
-        device_name = store_name if store_name.upper().startswith("NORMA") else f"NORMA {store_name}"
+        store_name = str(
+            entry.data.get("store_name") or entry.data.get("store_id") or "Filiale"
+        )
+        device_name = (
+            store_name
+            if store_name.upper().startswith("NORMA")
+            else f"NORMA {store_name}"
+        )
 
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, entry.entry_id)},

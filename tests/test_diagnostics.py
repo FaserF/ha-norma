@@ -33,4 +33,7 @@ async def test_diagnostics(hass: HomeAssistant) -> None:
     diag = await async_get_config_entry_diagnostics(hass, entry)
     assert diag["config_entry"]["data"]["username"] == "**REDACTED**"
     assert diag["config_entry"]["data"]["password"] == "**REDACTED**"
-    assert "cookies" not in diag["coordinator"]["data"] or diag["coordinator"]["data"]["cookies"] == "**REDACTED**"
+    assert (
+        "cookies" not in diag["coordinator"]["data"]
+        or diag["coordinator"]["data"]["cookies"] == "**REDACTED**"
+    )

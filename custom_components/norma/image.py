@@ -32,7 +32,9 @@ async def async_setup_entry(
         async_add_entities([NormaLoyaltyCardQrImage(hass, coordinator, entry)])
 
 
-class NormaLoyaltyCardQrImage(CoordinatorEntity[NormaDataUpdateCoordinator], ImageEntity):
+class NormaLoyaltyCardQrImage(
+    CoordinatorEntity[NormaDataUpdateCoordinator], ImageEntity
+):
     """Represents the Norma loyalty customer card QR code image entity."""
 
     _attr_icon = "mdi:qrcode-scan"
@@ -54,8 +56,14 @@ class NormaLoyaltyCardQrImage(CoordinatorEntity[NormaDataUpdateCoordinator], Ima
             self._attr_unique_id.encode()
         ).hexdigest()[:32]
 
-        store_name = str(entry.data.get("store_name") or entry.data.get("store_id") or "Filiale")
-        device_name = store_name if store_name.upper().startswith("NORMA") else f"NORMA {store_name}"
+        store_name = str(
+            entry.data.get("store_name") or entry.data.get("store_id") or "Filiale"
+        )
+        device_name = (
+            store_name
+            if store_name.upper().startswith("NORMA")
+            else f"NORMA {store_name}"
+        )
 
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, entry.entry_id)},
@@ -72,7 +80,9 @@ class NormaLoyaltyCardQrImage(CoordinatorEntity[NormaDataUpdateCoordinator], Ima
         """Return loyalty customer card ID from coordinator data."""
         if not self.coordinator.data:
             return None
-        return self.coordinator.data.get("loyalty_id", f"NORMA-{self.coordinator.username}")
+        return self.coordinator.data.get(
+            "loyalty_id", f"NORMA-{self.coordinator.username}"
+        )
 
     @property
     def available(self) -> bool:

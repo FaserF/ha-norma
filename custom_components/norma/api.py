@@ -9,9 +9,7 @@ from curl_cffi import requests
 
 _LOGGER = logging.getLogger(__name__)
 
-_DEFAULT_USER_AGENT = (
-    "NORMA-MobileApp/2.4.0 (Android/11; Mobile; de_DE)"
-)
+_DEFAULT_USER_AGENT = "NORMA-MobileApp/2.4.0 (Android/11; Mobile; de_DE)"
 
 # Known German PLZ to City mapping for quick resolution
 _PLZ_CITY_MAP: dict[str, str] = {
@@ -298,7 +296,9 @@ class NormaAPIClient:
 
     def activate_all_coupons(self) -> int:
         """Activate all available digital coupons via JSON API."""
-        _LOGGER.info("Activating all digital coupons via API for account %s", self.username)
+        _LOGGER.info(
+            "Activating all digital coupons via API for account %s", self.username
+        )
         if not self.auth_token:
             self.authenticate()
 

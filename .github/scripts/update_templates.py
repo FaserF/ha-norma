@@ -91,7 +91,9 @@ def clean_and_update_template(file_path, integration_version, ha_version, repo_n
                 blocks[i] = new_block
                 block_content = new_block
 
-        elif service_version and field_id == "norma_version" and repo_name == "ha-norma":
+        elif (
+            service_version and field_id == "norma_version" and repo_name == "ha-norma"
+        ):
 
             def repl_service(match):
                 quote = match.group(1) or ""
@@ -172,10 +174,21 @@ def clean_and_update_template(file_path, integration_version, ha_version, repo_n
 
         if "description:" in line:
             desc_lower = line.lower()
-            if any(
-                k in desc_lower
-                for k in ["domain", "host", "ip address", "url", "instance", "address"]
-            ) and "not share" not in desc_lower and "private" not in desc_lower:
+            if (
+                any(
+                    k in desc_lower
+                    for k in [
+                        "domain",
+                        "host",
+                        "ip address",
+                        "url",
+                        "instance",
+                        "address",
+                    ]
+                )
+                and "not share" not in desc_lower
+                and "private" not in desc_lower
+            ):
                 line = (
                     line.rstrip()
                     + " (Do NOT share sensitive passwords, credentials, or public API keys. Use example.com or 192.168.1.1 instead.)"

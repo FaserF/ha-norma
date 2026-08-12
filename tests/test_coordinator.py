@@ -41,12 +41,15 @@ async def test_coordinator_update_data(hass: HomeAssistant) -> None:
         ],
     }
 
-    with patch(
-        "custom_components.norma.api.NormaAPIClient.get_offers",
-        return_value=mock_offers,
-    ), patch(
-        "custom_components.norma.api.NormaAPIClient.get_coupons",
-        return_value=[],
+    with (
+        patch(
+            "custom_components.norma.api.NormaAPIClient.get_offers",
+            return_value=mock_offers,
+        ),
+        patch(
+            "custom_components.norma.api.NormaAPIClient.get_coupons",
+            return_value=[],
+        ),
     ):
         data = await coordinator._async_update_data()
         assert len(data["discounts"]) == 1
@@ -69,9 +72,12 @@ async def test_coordinator_activate_coupons(hass: HomeAssistant) -> None:
 
     coordinator = NormaDataUpdateCoordinator(hass, entry)
 
-    with patch(
-        "custom_components.norma.api.NormaAPIClient.activate_all_coupons",
-        return_value=2,
-    ), patch.object(coordinator, "async_request_refresh", new=AsyncMock()):
+    with (
+        patch(
+            "custom_components.norma.api.NormaAPIClient.activate_all_coupons",
+            return_value=2,
+        ),
+        patch.object(coordinator, "async_request_refresh", new=AsyncMock()),
+    ):
         count = await coordinator.async_activate_coupons()
         assert count == 2

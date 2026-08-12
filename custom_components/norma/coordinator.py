@@ -63,9 +63,7 @@ class NormaDataUpdateCoordinator(DataUpdateCoordinator):
         self._force_update: bool = False
 
         # HA persistent storage for restart-resistance
-        self.store: storage.Store = storage.Store(
-            hass, 1, f"{DOMAIN}_{self.store_id}"
-        )
+        self.store: storage.Store = storage.Store(hass, 1, f"{DOMAIN}_{self.store_id}")
 
         interval_hours = max(
             MIN_UPDATE_INTERVAL,
@@ -105,7 +103,9 @@ class NormaDataUpdateCoordinator(DataUpdateCoordinator):
 
     async def async_load_cache(self) -> None:
         """Load cached data from HA storage (restart-resistance)."""
-        _LOGGER.debug("Attempting to load cached Norma data for store %s", self.store_id)
+        _LOGGER.debug(
+            "Attempting to load cached Norma data for store %s", self.store_id
+        )
         cache = await self.store.async_load()
         if cache:
             required_keys = {"discounts", "valid_until", "coupons"}
@@ -286,11 +286,11 @@ class NormaDataUpdateCoordinator(DataUpdateCoordinator):
 
     async def async_activate_coupons(self) -> int:
         """Activate all available digital coupons for the user account."""
-        _LOGGER.info(
-            "Requesting coupon activation for Norma store %s", self.store_id
-        )
+        _LOGGER.info("Requesting coupon activation for Norma store %s", self.store_id)
         client = NormaAPIClient(
-            username=self.username, password=self.password, cookies=self.config_entry.data.get("cookies", {})
+            username=self.username,
+            password=self.password,
+            cookies=self.config_entry.data.get("cookies", {}),
         )
         activated_count = await self.hass.async_add_executor_job(
             client.activate_all_coupons

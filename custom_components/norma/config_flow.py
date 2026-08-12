@@ -109,7 +109,9 @@ class NormaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 return self.async_create_entry(title=title, data=data)
 
         store_options = {
-            str(s.get("id")): f"{s.get('name', 'NORMA')} - {s.get('street', '')}, {s.get('zip', '')} {s.get('city', '')}"
+            str(
+                s.get("id")
+            ): f"{s.get('name', 'NORMA')} - {s.get('street', '')}, {s.get('zip', '')} {s.get('city', '')}"
             for s in self._stores
         }
 
@@ -146,9 +148,9 @@ class NormaOptionsFlowHandler(config_entries.OptionsFlow):
 
         schema = vol.Schema(
             {
-                vol.Optional(
-                    CONF_UPDATE_INTERVAL, default=current_interval
-                ): vol.All(vol.Coerce(int), vol.Range(min=MIN_UPDATE_INTERVAL))
+                vol.Optional(CONF_UPDATE_INTERVAL, default=current_interval): vol.All(
+                    vol.Coerce(int), vol.Range(min=MIN_UPDATE_INTERVAL)
+                )
             }
         )
 
