@@ -1,10 +1,10 @@
-from homeassistant.core import HomeAssistant
-from pytest_homeassistant_custom_component.common import MockConfigEntry
-
 from custom_components.norma.binary_sensor import (
     NormaLoginStatusBinarySensor,
     NormaOffersAvailableBinarySensor,
 )
+from homeassistant.core import HomeAssistant
+from pytest_homeassistant_custom_component.common import MockConfigEntry
+
 from custom_components.norma.const import CONF_STORE_ID, DOMAIN
 from custom_components.norma.coordinator import NormaDataUpdateCoordinator
 
