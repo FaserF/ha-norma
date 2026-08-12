@@ -11,6 +11,7 @@ from homeassistant.core import callback
 
 from .api import NormaAPIClient
 from .const import (
+    CONF_AUTO_ACTIVATE_COUPONS,
     CONF_CITY,
     CONF_PASSWORD,
     CONF_STORE_ID,
@@ -33,14 +34,13 @@ class NormaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     VERSION = 1
 
     def __init__(self) -> None:
-        """Initialize flow."""
         self._stores: list[dict[str, Any]] = []
         self._credentials: dict[str, str] = {}
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> config_entries.ConfigFlowResult:
-        """Step 1: Optional Login credentials & ZIP code search."""
+        """Step 1: ZIP code search + optional credentials."""
         errors: dict[str, str] = {}
 
         if user_input is not None:
@@ -128,33 +128,115 @@ class NormaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     def async_get_options_flow(
         config_entry: config_entries.ConfigEntry,
     ) -> config_entries.OptionsFlow:
-        """Get options flow."""
-        return NormaOptionsFlowHandler()
+        return NormaOptionsFlowHandler(config_entry)
 
 
 class NormaOptionsFlowHandler(config_entries.OptionsFlow):
-    """Handle options for Norma."""
+    """Handle options for Norma — mirrors ha-lidl / ha-rewe pattern."""
+
+    def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
+        self._config_entry = config_entry
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
     ) -> config_entries.ConfigFlowResult:
-        """Manage integration options."""
+        """Main options step: update interval + action selector."""
         if user_input is not None:
-            return self.async_create_entry(title="", data=user_input)
+            action = user_input.get("action", "save")
+            if action == "login":
+                return await self.async_step_login()
+            if action == "logout":
+                new_data = {
+                    k: v
+                    for k, v in self._config_entry.data.items()
+                    if k not in (CONF_USERNAME, CONF_PASSWORD)
+                }
+                self.hass.config_entries.async_update_entry(
+                    self._config_entry, data=new_data
+                )
+                return self.async_create_entry(
+                    title="", data=self._config_entry.options
+                )
 
-        current_interval = self.config_entry.options.get(
+            # action == "save": persist update_interval
+            new_options = {
+                **self._config_entry.options,
+                CONF_UPDATE_INTERVAL: user_input.get(
+                    CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL
+                ),
+                CONF_AUTO_ACTIVATE_COUPONS: user_input.get(
+                    CONF_AUTO_ACTIVATE_COUPONS, False
+                ),
+            }
+            return self.async_create_entry(title="", data=new_options)
+
+        current_interval = self._config_entry.options.get(
             CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL
         )
+        current_auto_activate = self._config_entry.options.get(
+            CONF_AUTO_ACTIVATE_COUPONS, False
+        )
+        has_account = bool(
+            self._config_entry.data.get(CONF_USERNAME)
+            and self._config_entry.data.get(CONF_PASSWORD)
+        )
+        action_choices = {"save": "Save", "login": "Configure Account"}
+        if has_account:
+            action_choices["logout"] = "Remove Account"
 
         schema = vol.Schema(
             {
                 vol.Optional(CONF_UPDATE_INTERVAL, default=current_interval): vol.All(
                     vol.Coerce(int), vol.Range(min=MIN_UPDATE_INTERVAL)
-                )
+                ),
+                vol.Optional(
+                    CONF_AUTO_ACTIVATE_COUPONS, default=current_auto_activate
+                ): bool,
+                vol.Required("action", default="save"): vol.In(action_choices),
             }
         )
 
-        return self.async_show_form(
-            step_id="init",
-            data_schema=schema,
+        return self.async_show_form(step_id="init", data_schema=schema)
+
+    async def async_step_login(
+        self, user_input: dict[str, Any] | None = None
+    ) -> config_entries.ConfigFlowResult:
+        """Configure username & password for account features."""
+        if user_input is not None:
+            username = user_input.get(CONF_USERNAME, "").strip()
+            password = user_input.get(CONF_PASSWORD, "").strip()
+            # Write credentials directly into entry.data so coordinator picks them up
+            new_data = {
+                **self._config_entry.data,
+                CONF_USERNAME: username,
+                CONF_PASSWORD: password,
+            }
+            self.hass.config_entries.async_update_entry(
+                self._config_entry, data=new_data
+            )
+            new_options = {**self._config_entry.options, **user_input}
+            return self.async_create_entry(title="", data=new_options)
+
+        current_username = self._config_entry.options.get(
+            CONF_USERNAME,
+            self._config_entry.data.get(CONF_USERNAME, ""),
         )
+        current_password = self._config_entry.options.get(
+            CONF_PASSWORD,
+            self._config_entry.data.get(CONF_PASSWORD, ""),
+        )
+        current_auto_activate = self._config_entry.options.get(
+            CONF_AUTO_ACTIVATE_COUPONS, False
+        )
+
+        schema = vol.Schema(
+            {
+                vol.Optional(CONF_USERNAME, default=current_username): str,
+                vol.Optional(CONF_PASSWORD, default=current_password): str,
+                vol.Optional(
+                    CONF_AUTO_ACTIVATE_COUPONS, default=current_auto_activate
+                ): bool,
+            }
+        )
+
+        return self.async_show_form(step_id="login", data_schema=schema)

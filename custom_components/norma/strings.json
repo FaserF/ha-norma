@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "NORMA Setup",
-        "description": "Enter your ZIP code to search for nearby NORMA stores. User login (email & password) is optional.",
+        "description": "Enter your ZIP code to search for nearby NORMA stores. Account credentials (email & password) are optional and enable coupon features.",
         "data": {
           "zip_code": "ZIP Code / PLZ",
           "username": "Email (Optional)",
@@ -29,10 +29,21 @@
   "options": {
     "step": {
       "init": {
-        "title": "NORMA Integration Options",
-        "description": "Configure the update interval (minimum 12 hours to respect API anti-ban limits).",
+        "title": "NORMA Options",
+        "description": "Configure the update interval and account settings.",
         "data": {
-          "update_interval": "Update Interval (hours)"
+          "update_interval": "Update Interval (hours)",
+          "auto_activate_coupons": "Automatically activate coupons in the background",
+          "action": "Action"
+        }
+      },
+      "login": {
+        "title": "NORMA Account",
+        "description": "Enter your NORMA account credentials to enable coupon features.",
+        "data": {
+          "username": "Email",
+          "password": "Password",
+          "auto_activate_coupons": "Automatically activate coupons in the background"
         }
       }
     }
@@ -42,19 +53,11 @@
       "offers_count": {
         "name": "Weekly Offers"
       },
-      "coupons_count": {
-        "name": "Active Coupons"
+      "activated_coupons": {
+        "name": "Activated Coupons"
       },
-      "valid_until": {
-        "name": "Offers Valid Until"
-      }
-    },
-    "binary_sensor": {
-      "offers_available": {
-        "name": "Offers Available"
-      },
-      "login_status": {
-        "name": "User Authenticated"
+      "available_coupons": {
+        "name": "Available Coupons"
       }
     },
     "button": {

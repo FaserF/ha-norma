@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "NORMA Einrichten",
-        "description": "Gib deine Postleitzahl ein, um nach NORMA Filialen in deiner Nähe zu suchen. Der Benutzer-Login (E-Mail & Passwort) ist optional.",
+        "description": "Gib deine Postleitzahl ein, um nach NORMA Filialen in deiner Nähe zu suchen. Konto-Zugangsdaten (E-Mail & Passwort) sind optional und ermöglichen Coupon-Funktionen.",
         "data": {
           "zip_code": "Postleitzahl (PLZ)",
           "username": "E-Mail (Optional)",
@@ -30,9 +30,20 @@
     "step": {
       "init": {
         "title": "NORMA Optionen",
-        "description": "Konfiguriere das Aktualisierungsintervall (Mindestens 12 Stunden, um API-Sperren zu vermeiden).",
+        "description": "Aktualisierungsintervall und Konto-Einstellungen konfigurieren.",
         "data": {
-          "update_interval": "Aktualisierungsintervall (Stunden)"
+          "update_interval": "Aktualisierungsintervall (Stunden)",
+          "auto_activate_coupons": "Coupons automatisch im Hintergrund aktivieren",
+          "action": "Aktion"
+        }
+      },
+      "login": {
+        "title": "NORMA Konto",
+        "description": "Gib deine NORMA Konto-Zugangsdaten ein, um Coupon-Funktionen zu aktivieren.",
+        "data": {
+          "username": "E-Mail",
+          "password": "Passwort",
+          "auto_activate_coupons": "Coupons automatisch im Hintergrund aktivieren"
         }
       }
     }
@@ -42,19 +53,11 @@
       "offers_count": {
         "name": "Wochenangebote"
       },
-      "coupons_count": {
-        "name": "Aktive Coupons"
+      "activated_coupons": {
+        "name": "Aktivierte Coupons"
       },
-      "valid_until": {
-        "name": "Angebote gültig bis"
-      }
-    },
-    "binary_sensor": {
-      "offers_available": {
-        "name": "Angebote verfügbar"
-      },
-      "login_status": {
-        "name": "Benutzer angemeldet"
+      "available_coupons": {
+        "name": "Verfügbare Coupons"
       }
     },
     "button": {

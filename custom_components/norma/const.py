@@ -3,6 +3,7 @@
 from typing import Final
 
 DOMAIN: Final = "norma"
+ATTRIBUTION: Final = "Data provided by NORMA Web API"
 
 # Configuration keys
 CONF_STORE_ID: Final = "store_id"
@@ -13,6 +14,10 @@ CONF_STORE_NAME: Final = "store_name"
 CONF_UPDATE_INTERVAL: Final = "update_interval"
 CONF_USERNAME: Final = "username"
 CONF_PASSWORD: Final = "password"
+CONF_AUTO_ACTIVATE_COUPONS: Final = "auto_activate_coupons"
+
+# Account device identifier suffix
+ACCOUNT_KEY_SUFFIX: Final = "_account"
 
 # Defaults & limits
 DEFAULT_UPDATE_INTERVAL: Final = 24  # hours

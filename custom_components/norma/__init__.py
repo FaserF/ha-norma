@@ -7,6 +7,7 @@ import logging
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import device_registry as dr
 
 from .const import DOMAIN
 from .coordinator import NormaDataUpdateCoordinator
@@ -15,7 +16,6 @@ _LOGGER = logging.getLogger(__name__)
 
 PLATFORMS: list[Platform] = [
     Platform.SENSOR,
-    Platform.BINARY_SENSOR,
     Platform.BUTTON,
     Platform.IMAGE,
 ]
@@ -34,6 +34,20 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     domain_data[entry.entry_id] = coordinator
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+
+    # Remove orphaned account device when credentials were cleared (logout)
+    if not coordinator.has_account:
+        dev_reg = dr.async_get(hass)
+        account_device = dev_reg.async_get_device(
+            identifiers={(DOMAIN, coordinator.account_key)}
+        )
+        if account_device:
+            dev_reg.async_remove_device(account_device.id)
+            _LOGGER.debug(
+                "NORMA: removed orphaned account device for store %s",
+                coordinator.store_id,
+            )
+
     entry.async_on_unload(entry.add_update_listener(async_update_options))
 
     return True

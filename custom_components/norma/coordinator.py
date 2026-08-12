@@ -24,12 +24,14 @@ from homeassistant.util import dt as dt_util
 
 from .api import NormaAPIClient
 from .const import (
+    ACCOUNT_KEY_SUFFIX,
     ATTR_BASE_PRICE,
     ATTR_CATEGORY,
     ATTR_DISCOUNT_PRICE,
     ATTR_DISCOUNT_TITLE,
     ATTR_PICTURE,
     ATTR_VALID_DATE,
+    CONF_AUTO_ACTIVATE_COUPONS,
     CONF_PASSWORD,
     CONF_STORE_ID,
     CONF_UPDATE_INTERVAL,
@@ -53,7 +55,14 @@ class NormaDataUpdateCoordinator(DataUpdateCoordinator):
         self.store_id: str = config[CONF_STORE_ID]
         self.username: str | None = config.get(CONF_USERNAME)
         self.password: str | None = config.get(CONF_PASSWORD)
+        self.auto_activate_coupons: bool = config.get(CONF_AUTO_ACTIVATE_COUPONS, False)
         self.config_entry = entry
+
+        # Account device identifiers (mirrors ha-lidl / ha-rewe pattern)
+        self.account_key: str = f"{self.store_id}{ACCOUNT_KEY_SUFFIX}"
+        self.account_configuration_url: str = (
+            "https://www.norma-online.de/de/mein-konto/"
+        )
 
         # Anti-ban state tracking
         self._backoff_until: datetime | None = None
@@ -100,6 +109,11 @@ class NormaDataUpdateCoordinator(DataUpdateCoordinator):
             hour=0, minute=0, second=0, microsecond=0
         )
         return self._last_success >= current_monday
+
+    @property
+    def has_account(self) -> bool:
+        """Return True if user credentials are configured."""
+        return bool(self.username and self.password)
 
     async def async_load_cache(self) -> None:
         """Load cached data from HA storage (restart-resistance)."""

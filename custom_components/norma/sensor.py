@@ -7,12 +7,13 @@ from typing import Any
 
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import ATTR_ATTRIBUTION
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN
+from .const import ATTRIBUTION, DOMAIN
 from .coordinator import NormaDataUpdateCoordinator
 
 _LOGGER = logging.getLogger(__name__)
@@ -30,14 +31,24 @@ async def async_setup_entry(
         NormaOffersSensor(coordinator, entry),
     ]
 
-    if entry.data.get("username"):
-        entities.append(NormaCouponsSensor(coordinator, entry))
+    if coordinator.has_account:
+        entities.extend(
+            [
+                NormaActivatedCouponsSensor(coordinator, entry),
+                NormaAvailableCouponsSensor(coordinator, entry),
+            ]
+        )
 
     async_add_entities(entities)
 
 
-class NormaBaseEntity(CoordinatorEntity[NormaDataUpdateCoordinator]):
-    """Base entity for Norma sensors."""
+# ---------------------------------------------------------------------------
+# Store device sensors
+# ---------------------------------------------------------------------------
+
+
+class NormaStoreBaseEntity(CoordinatorEntity[NormaDataUpdateCoordinator]):
+    """Base entity attached to the NORMA store device."""
 
     _attr_has_entity_name = True
 
@@ -47,9 +58,7 @@ class NormaBaseEntity(CoordinatorEntity[NormaDataUpdateCoordinator]):
         entry: ConfigEntry,
         key: str,
     ) -> None:
-        """Initialize the base entity."""
         super().__init__(coordinator)
-        self._key = key
         self._attr_unique_id = f"{entry.entry_id}_{key}"
 
         store_name = str(
@@ -70,82 +79,124 @@ class NormaBaseEntity(CoordinatorEntity[NormaDataUpdateCoordinator]):
         )
 
 
-class NormaOffersSensor(NormaBaseEntity, SensorEntity):
+class NormaOffersSensor(NormaStoreBaseEntity, SensorEntity):
     """Sensor tracking total weekly discounts."""
 
     _attr_translation_key = "offers_count"
     _attr_icon = "mdi:tag-multiple"
+    _attr_native_unit_of_measurement = "items"
 
     def __init__(
         self, coordinator: NormaDataUpdateCoordinator, entry: ConfigEntry
     ) -> None:
-        """Initialize offer sensor."""
         super().__init__(coordinator, entry, "offers_count")
 
     @property
     def native_value(self) -> int:
-        """Return total number of discounts."""
         if not self.coordinator.data:
             return 0
         return len(self.coordinator.data.get("discounts", []))
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
-        """Return list of discounts as extra attributes."""
         if not self.coordinator.data:
-            return {}
+            return {ATTR_ATTRIBUTION: ATTRIBUTION}
         return {
             "discounts": self.coordinator.data.get("discounts", []),
             "valid_until": self.coordinator.data.get("valid_until"),
             "last_updated": self.coordinator.data.get("last_success"),
+            ATTR_ATTRIBUTION: ATTRIBUTION,
         }
 
 
-class NormaCouponsSensor(NormaBaseEntity, SensorEntity):
-    """Sensor tracking active user coupons."""
 
-    _attr_translation_key = "coupons_count"
-    _attr_icon = "mdi:ticket-percent"
+# ---------------------------------------------------------------------------
+# Account device sensors
+# ---------------------------------------------------------------------------
+
+
+class NormaAccountBaseEntity(CoordinatorEntity[NormaDataUpdateCoordinator]):
+    """Base entity attached to the NORMA account device."""
+
+    _attr_has_entity_name = True
+
+    def __init__(
+        self,
+        coordinator: NormaDataUpdateCoordinator,
+        entry: ConfigEntry,
+        key: str,
+    ) -> None:
+        super().__init__(coordinator)
+        self._attr_unique_id = f"{coordinator.account_key}_{key}"
+
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, coordinator.account_key)},
+            name="NORMA Konto",
+            manufacturer="NORMA",
+            model="NORMA Kundenkonto",
+            configuration_url=coordinator.account_configuration_url,
+        )
+
+    @property
+    def available(self) -> bool:
+        return self.coordinator.data is not None and self.coordinator.has_account
+
+
+class NormaActivatedCouponsSensor(NormaAccountBaseEntity, SensorEntity):
+    """Sensor tracking activated NORMA coupons."""
+
+    _attr_translation_key = "activated_coupons"
+    _attr_icon = "mdi:ticket-confirmation"
+    _attr_native_unit_of_measurement = "items"
 
     def __init__(
         self, coordinator: NormaDataUpdateCoordinator, entry: ConfigEntry
     ) -> None:
-        """Initialize coupon sensor."""
-        super().__init__(coordinator, entry, "coupons_count")
+        super().__init__(coordinator, entry, "activated_coupons")
 
     @property
     def native_value(self) -> int:
-        """Return total active coupons."""
         if not self.coordinator.data:
             return 0
-        return len(self.coordinator.data.get("coupons", []))
+        coupons: list[dict[str, Any]] = self.coordinator.data.get("coupons", [])
+        return len([c for c in coupons if c.get("activated", False)])
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
-        """Return coupon list attributes."""
         if not self.coordinator.data:
-            return {}
+            return {ATTR_ATTRIBUTION: ATTRIBUTION}
+        coupons = self.coordinator.data.get("coupons", [])
         return {
-            "coupons": self.coordinator.data.get("coupons", []),
-            "is_authenticated": self.coordinator.data.get("is_authenticated", False),
+            "coupons": [c for c in coupons if c.get("activated", False)],
+            ATTR_ATTRIBUTION: ATTRIBUTION,
         }
 
 
-class NormaValidUntilSensor(NormaBaseEntity, SensorEntity):
-    """Sensor tracking valid_until date for current offers."""
+class NormaAvailableCouponsSensor(NormaAccountBaseEntity, SensorEntity):
+    """Sensor tracking available (non-activated) NORMA coupons."""
 
-    _attr_translation_key = "valid_until"
-    _attr_icon = "mdi:calendar-clock"
+    _attr_translation_key = "available_coupons"
+    _attr_icon = "mdi:ticket-percent"
+    _attr_native_unit_of_measurement = "items"
 
     def __init__(
         self, coordinator: NormaDataUpdateCoordinator, entry: ConfigEntry
     ) -> None:
-        """Initialize valid until sensor."""
-        super().__init__(coordinator, entry, "valid_until")
+        super().__init__(coordinator, entry, "available_coupons")
 
     @property
-    def native_value(self) -> str | None:
-        """Return valid_until date string."""
+    def native_value(self) -> int:
         if not self.coordinator.data:
-            return None
-        return self.coordinator.data.get("valid_until")
+            return 0
+        coupons: list[dict[str, Any]] = self.coordinator.data.get("coupons", [])
+        return len([c for c in coupons if not c.get("activated", False)])
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        if not self.coordinator.data:
+            return {ATTR_ATTRIBUTION: ATTRIBUTION}
+        coupons = self.coordinator.data.get("coupons", [])
+        return {
+            "coupons": [c for c in coupons if not c.get("activated", False)],
+            ATTR_ATTRIBUTION: ATTRIBUTION,
+        }
