@@ -1,26 +1,22 @@
 """Tests for the Norma sensor platform."""
 
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.norma.const import CONF_STORE_ID, DOMAIN
 from custom_components.norma.coordinator import NormaDataUpdateCoordinator
 from custom_components.norma.sensor import (
     NormaCouponsSensor,
     NormaOffersSensor,
-    NormaValidUntilSensor,
 )
 
 
 async def test_sensors_state(hass: HomeAssistant) -> None:
-    """Test offer, coupon, and valid_until sensor states."""
-    entry = ConfigEntry(
-        version=1,
-        minor_version=0,
+    """Test offer and coupon sensor states."""
+    entry = MockConfigEntry(
         domain=DOMAIN,
         title="NORMA Test",
         data={CONF_STORE_ID: "norma_123", "username": "test@user.de"},
-        source="user",
         options={},
         entry_id="test_entry_id",
     )
@@ -36,8 +32,7 @@ async def test_sensors_state(hass: HomeAssistant) -> None:
 
     offers_sensor = NormaOffersSensor(coordinator, entry)
     coupons_sensor = NormaCouponsSensor(coordinator, entry)
-    valid_until_sensor = NormaValidUntilSensor(coordinator, entry)
 
     assert offers_sensor.native_value == 1
+    assert offers_sensor.extra_state_attributes["valid_until"] == "2026-08-31"
     assert coupons_sensor.native_value == 1
-    assert valid_until_sensor.native_value == "2026-08-31"

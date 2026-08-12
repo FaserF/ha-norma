@@ -50,6 +50,7 @@ class NormaLoyaltyCardQrImage(
         """Initialize loyalty card QR image entity."""
         CoordinatorEntity.__init__(self, coordinator)
         ImageEntity.__init__(self, hass)
+        self.hass = hass
 
         self._attr_unique_id = f"{entry.entry_id}_loyalty_card_qr"
         self._attr_access_token = hashlib.sha256(
