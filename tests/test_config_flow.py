@@ -73,15 +73,15 @@ async def test_flow_user_search_and_select_store(hass: HomeAssistant) -> None:
         assert result_entry["data"][CONF_USERNAME] == "seitzf1@yahoo.de"
 
 
+from pytest_homeassistant_custom_component.common import MockConfigEntry
+
+
 async def test_options_flow(hass: HomeAssistant) -> None:
     """Test options flow."""
-    entry = config_entries.ConfigEntry(
-        version=1,
-        minor_version=0,
+    entry = MockConfigEntry(
         domain=DOMAIN,
         title="NORMA Test",
         data={CONF_STORE_ID: "norma_123"},
-        source="user",
         options={},
         entry_id="test_entry_id",
     )

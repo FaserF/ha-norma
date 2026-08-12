@@ -1,9 +1,7 @@
-"""Tests for the Norma data update coordinator."""
-
 from unittest.mock import AsyncMock, patch
 
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.norma.const import CONF_STORE_ID, DOMAIN
 from custom_components.norma.coordinator import NormaDataUpdateCoordinator
@@ -11,13 +9,10 @@ from custom_components.norma.coordinator import NormaDataUpdateCoordinator
 
 async def test_coordinator_update_data(hass: HomeAssistant) -> None:
     """Test coordinator data fetch."""
-    entry = ConfigEntry(
-        version=1,
-        minor_version=0,
+    entry = MockConfigEntry(
         domain=DOMAIN,
         title="NORMA Test Store",
         data={CONF_STORE_ID: "norma_123"},
-        source="user",
         options={},
         entry_id="test_entry_id",
     )
@@ -59,13 +54,10 @@ async def test_coordinator_update_data(hass: HomeAssistant) -> None:
 
 async def test_coordinator_activate_coupons(hass: HomeAssistant) -> None:
     """Test coordinator activate coupons method."""
-    entry = ConfigEntry(
-        version=1,
-        minor_version=0,
+    entry = MockConfigEntry(
         domain=DOMAIN,
         title="NORMA Test Store",
         data={CONF_STORE_ID: "norma_123", "username": "test@user.de"},
-        source="user",
         options={},
         entry_id="test_entry_id",
     )

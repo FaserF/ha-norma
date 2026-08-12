@@ -1,9 +1,7 @@
-"""Tests for the Norma button platform."""
-
 from unittest.mock import AsyncMock
 
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.norma.button import (
     NormaActivateCouponsButton,
@@ -15,13 +13,10 @@ from custom_components.norma.coordinator import NormaDataUpdateCoordinator
 
 async def test_button_presses(hass: HomeAssistant) -> None:
     """Test button entity presses."""
-    entry = ConfigEntry(
-        version=1,
-        minor_version=0,
+    entry = MockConfigEntry(
         domain=DOMAIN,
         title="NORMA Test",
         data={CONF_STORE_ID: "norma_123", "username": "test@user.de"},
-        source="user",
         options={},
         entry_id="test_entry_id",
     )

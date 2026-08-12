@@ -1,7 +1,5 @@
-"""Tests for the Norma image platform (Loyalty Card QR Code)."""
-
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.norma.const import CONF_STORE_ID, DOMAIN
 from custom_components.norma.coordinator import NormaDataUpdateCoordinator
@@ -10,13 +8,10 @@ from custom_components.norma.image import NormaLoyaltyCardQrImage
 
 async def test_loyalty_card_qr_image(hass: HomeAssistant) -> None:
     """Test loyalty card QR code image entity generation."""
-    entry = ConfigEntry(
-        version=1,
-        minor_version=0,
+    entry = MockConfigEntry(
         domain=DOMAIN,
         title="NORMA Test",
         data={CONF_STORE_ID: "norma_123", "username": "test@user.de"},
-        source="user",
         options={},
         entry_id="test_entry_id",
     )

@@ -1,7 +1,5 @@
-"""Tests for the Norma binary sensor platform."""
-
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.norma.binary_sensor import (
     NormaLoginStatusBinarySensor,
@@ -13,13 +11,10 @@ from custom_components.norma.coordinator import NormaDataUpdateCoordinator
 
 async def test_binary_sensors_state(hass: HomeAssistant) -> None:
     """Test binary sensor on/off states."""
-    entry = ConfigEntry(
-        version=1,
-        minor_version=0,
+    entry = MockConfigEntry(
         domain=DOMAIN,
         title="NORMA Test",
         data={CONF_STORE_ID: "norma_123", "username": "test@user.de"},
-        source="user",
         options={},
         entry_id="test_entry_id",
     )
