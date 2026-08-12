@@ -1,0 +1,12 @@
+{
+  "name": "Norma Offers & Coupons",
+  "hacs": "2.0.0",
+  "country": [
+    "DE",
+    "AT",
+    "FR",
+    "CZ"
+  ],
+  "zip_release": true,
+  "filename": "norma.zip"
+}

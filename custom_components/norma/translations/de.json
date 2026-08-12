@@ -1,0 +1,80 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "NORMA Einrichten",
+        "description": "Gib deine Postleitzahl ein, um nach NORMA Filialen in deiner Nähe zu suchen. Der Benutzer-Login (E-Mail & Passwort) ist optional.",
+        "data": {
+          "zip_code": "Postleitzahl (PLZ)",
+          "username": "E-Mail (Optional)",
+          "password": "Passwort (Optional)"
+        }
+      },
+      "select_store": {
+        "title": "NORMA Filiale auswählen",
+        "description": "Wähle deine bevorzugte NORMA Filiale aus den Suchergebnissen aus.",
+        "data": {
+          "store_id": "NORMA Filiale"
+        }
+      }
+    },
+    "error": {
+      "missing_zip": "Bitte gib eine gültige Postleitzahl ein.",
+      "no_stores_found": "Keine NORMA Filialen für diese PLZ gefunden."
+    },
+    "abort": {
+      "already_configured": "Diese NORMA Filiale ist bereits eingerichtet."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "NORMA Optionen",
+        "description": "Konfiguriere das Aktualisierungsintervall (Mindestens 12 Stunden, um API-Sperren zu vermeiden).",
+        "data": {
+          "update_interval": "Aktualisierungsintervall (Stunden)"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "offers_count": {
+        "name": "Wochenangebote"
+      },
+      "coupons_count": {
+        "name": "Aktive Coupons"
+      },
+      "valid_until": {
+        "name": "Angebote gültig bis"
+      }
+    },
+    "binary_sensor": {
+      "offers_available": {
+        "name": "Angebote verfügbar"
+      },
+      "login_status": {
+        "name": "Benutzer angemeldet"
+      }
+    },
+    "button": {
+      "force_update": {
+        "name": "Aktualisierung erzwingen"
+      },
+      "activate_coupons": {
+        "name": "Alle Coupons aktivieren"
+      }
+    },
+    "image": {
+      "loyalty_card_qr": {
+        "name": "Kundenkarte QR-Code"
+      }
+    }
+  },
+  "issues": {
+    "connection_error": {
+      "title": "NORMA API Verbindungsfehler",
+      "description": "Seit 24 Stunden konnten keine NORMA Angebotsdaten aktualisiert werden. Die API ist möglicherweise vorübergehend nicht erreichbar."
+    }
+  }
+}
