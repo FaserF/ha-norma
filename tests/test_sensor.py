@@ -17,7 +17,11 @@ async def test_sensors_state(hass: HomeAssistant) -> None:
     entry = MockConfigEntry(
         domain=DOMAIN,
         title="NORMA Test",
-        data={CONF_STORE_ID: "norma_123", "username": "test@user.de", "password": "secretpassword"},
+        data={
+            CONF_STORE_ID: "norma_123",
+            "username": "test@user.de",
+            "password": "secretpassword",
+        },
         options={},
         entry_id="test_entry_id",
     )
