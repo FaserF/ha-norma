@@ -141,11 +141,7 @@ def main():
             ]
             if changelog_from:
                 cmd.extend(["--from-tag", changelog_from])
-            changelog_md = (
-                subprocess.check_output(cmd)
-                .decode("utf-8")
-                .strip()
-            )
+            changelog_md = subprocess.check_output(cmd).decode("utf-8").strip()
         except Exception:  # noqa: BLE001
             changelog_md = (
                 "_Changelog could not be generated automatically. See commit history._"
