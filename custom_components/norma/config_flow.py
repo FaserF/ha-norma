@@ -8,7 +8,6 @@ from typing import Any
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.core import callback
-from homeassistant.data_entry_flow import FlowResult
 
 from .api import NormaAPIClient
 from .const import (
@@ -40,7 +39,7 @@ class NormaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
+    ) -> config_entries.ConfigFlowResult:
         """Step 1: Optional Login credentials & ZIP code search."""
         errors: dict[str, str] = {}
 
@@ -85,7 +84,7 @@ class NormaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_select_store(
         self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
+    ) -> config_entries.ConfigFlowResult:
         """Step 2: Select store from search results."""
         errors: dict[str, str] = {}
 
@@ -128,19 +127,15 @@ class NormaConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         config_entry: config_entries.ConfigEntry,
     ) -> config_entries.OptionsFlow:
         """Get options flow."""
-        return NormaOptionsFlowHandler(config_entry)
+        return NormaOptionsFlowHandler()
 
 
 class NormaOptionsFlowHandler(config_entries.OptionsFlow):
     """Handle options for Norma."""
 
-    def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
-        """Initialize options flow."""
-        self.config_entry = config_entry
-
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
+    ) -> config_entries.ConfigFlowResult:
         """Manage integration options."""
         if user_input is not None:
             return self.async_create_entry(title="", data=user_input)
