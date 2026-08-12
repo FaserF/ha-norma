@@ -42,8 +42,7 @@
         "description": "Enter your NORMA account credentials to enable coupon features.",
         "data": {
           "username": "Email",
-          "password": "Password",
-          "auto_activate_coupons": "Automatically activate coupons in the background"
+          "password": "Password"
         }
       }
     }

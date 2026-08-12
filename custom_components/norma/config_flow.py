@@ -214,28 +214,15 @@ class NormaOptionsFlowHandler(config_entries.OptionsFlow):
             self.hass.config_entries.async_update_entry(
                 self._config_entry, data=new_data
             )
-            new_options = {**self._config_entry.options, **user_input}
-            return self.async_create_entry(title="", data=new_options)
+            return self.async_create_entry(title="", data=self._config_entry.options)
 
-        current_username = self._config_entry.options.get(
-            CONF_USERNAME,
-            self._config_entry.data.get(CONF_USERNAME, ""),
-        )
-        current_password = self._config_entry.options.get(
-            CONF_PASSWORD,
-            self._config_entry.data.get(CONF_PASSWORD, ""),
-        )
-        current_auto_activate = self._config_entry.options.get(
-            CONF_AUTO_ACTIVATE_COUPONS, False
-        )
+        current_username = self._config_entry.data.get(CONF_USERNAME, "")
+        current_password = self._config_entry.data.get(CONF_PASSWORD, "")
 
         schema = vol.Schema(
             {
                 vol.Optional(CONF_USERNAME, default=current_username): str,
                 vol.Optional(CONF_PASSWORD, default=current_password): str,
-                vol.Optional(
-                    CONF_AUTO_ACTIVATE_COUPONS, default=current_auto_activate
-                ): bool,
             }
         )
 

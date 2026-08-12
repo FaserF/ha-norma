@@ -42,8 +42,7 @@
         "description": "Gib deine NORMA Konto-Zugangsdaten ein, um Coupon-Funktionen zu aktivieren.",
         "data": {
           "username": "E-Mail",
-          "password": "Passwort",
-          "auto_activate_coupons": "Coupons automatisch im Hintergrund aktivieren"
+          "password": "Passwort"
         }
       }
     }
