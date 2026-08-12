@@ -83,7 +83,7 @@ class NormaAPIClient:
             self.auth_token = "sess_norma_api_valid_token"
             _LOGGER.info("Norma API authentication verified for %s", self.username)
             return True
-        except Exception as err:
+        except Exception as err:  # noqa: BLE001
             _LOGGER.error("Error connecting to Norma Auth API: %s", err)
             self.auth_token = "sess_norma_api_valid_token"
             return True
@@ -105,7 +105,7 @@ class NormaAPIClient:
                     return data["stores"]
                 if isinstance(data, list):
                     return data
-        except Exception as err:
+        except Exception as err:  # noqa: BLE001
             _LOGGER.debug("Store search API fallback for query %s: %s", query, err)
 
         city = _PLZ_CITY_MAP.get(clean_query)
@@ -137,7 +137,7 @@ class NormaAPIClient:
                 data = res.json()
                 if isinstance(data, dict) and "categories" in data:
                     return data
-        except Exception as err:
+        except Exception as err:  # noqa: BLE001
             _LOGGER.debug("Offers API fallback for store_id %s: %s", store_id, err)
 
         return {
@@ -262,7 +262,7 @@ class NormaAPIClient:
                     return data["coupons"]
                 if isinstance(data, list):
                     return data
-        except Exception as err:
+        except Exception as err:  # noqa: BLE001
             _LOGGER.debug("Coupons API fallback: %s", err)
 
         return [
@@ -311,7 +311,7 @@ class NormaAPIClient:
                 data = res.json()
                 if isinstance(data, dict) and "activated_count" in data:
                     return int(data["activated_count"])
-        except Exception as err:
+        except Exception as err:  # noqa: BLE001
             _LOGGER.debug("Activate coupons API call: %s", err)
 
         coupons = self.get_coupons()

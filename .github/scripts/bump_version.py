@@ -1,3 +1,4 @@
+import json
 import re
 import subprocess
 import sys
@@ -14,7 +15,7 @@ def get_latest_tag():
         )
         tags = result.stdout.strip().split("\n")
         return tags[0] if tags and tags[0] else None
-    except Exception:
+    except Exception:  # noqa: BLE001
         return None
 
 
@@ -61,6 +62,7 @@ def bump_version(current, bump_type, release_status, all_tags=None):
                 ["git", "tag", "--list", "--sort=-v:refname"],
                 capture_output=True,
                 text=True,
+                check=False,
             )
             for t in res.stdout.strip().split("\n"):
                 t = t.lstrip("v")
@@ -68,7 +70,7 @@ def bump_version(current, bump_type, release_status, all_tags=None):
                     s_major, s_minor, s_patch, _, _ = parse_version(t)
                     latest_stable = (s_major, s_minor, s_patch)
                     break
-        except Exception:
+        except Exception:  # noqa: BLE001, S110
             pass
 
     # Calculate Target Stable Core
@@ -82,61 +84,44 @@ def bump_version(current, bump_type, release_status, all_tags=None):
     target_core_str = f"{target_core[0]}.{target_core[1]}.{target_core[2]}"
 
     if is_target_beta:
-        # If current version's core matches target_core and is a beta, increment beta_num
         current_core = (major, minor, patch)
         if current_core == target_core and is_curr_beta:
             return f"{target_core_str}-beta.{curr_beta_num + 1}"
         return f"{target_core_str}-beta.0"
-    # Stable release
-    # If we are currently on a beta for this EXACT core, just strip the beta
-    # (e.g. 1.1.0-beta.5 -> 1.1.0)
+
     current_core = (major, minor, patch)
     if current_core == target_core and is_curr_beta:
         return target_core_str
 
-    # Otherwise, if we were on an OLDER version, the target_core is already bumped
     return target_core_str
 
 
 def update_files(new_version):
-    # Update pyproject.toml
-    with open("pyproject.toml") as f:
-        content = f.read()
-    # Match version = "X.Y.Z"
-    content = re.sub(
-        r'version\s*=\s*"[^"]+"',
-        f'version = "{new_version}"',
-        content,
-        count=1,
-    )
-    with open("pyproject.toml", "w") as f:
-        f.write(content)
-
-    # Update manifest.json
-    import json
-
-    with open("custom_components/lidl/manifest.json") as f:
-        manifest = json.load(f)
-    manifest["version"] = new_version
-    with open("custom_components/lidl/manifest.json", "w") as f:
-        json.dump(manifest, f, indent=2)
-        f.write("\n")
+    manifest_path = "custom_components/norma/manifest.json"
+    try:
+        with open(manifest_path, encoding="utf-8") as f:
+            manifest = json.load(f)
+        manifest["version"] = new_version
+        with open(manifest_path, "w", encoding="utf-8") as f:
+            json.dump(manifest, f, indent=2)
+            f.write("\n")
+    except Exception as exc:  # noqa: BLE001
+        print(f"Error updating manifest.json: {exc}")
 
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
         sys.exit(1)
 
-    bump_type = sys.argv[1].lower()
-    release_status = sys.argv[2].lower()
+    b_type = sys.argv[1].lower()
+    r_status = sys.argv[2].lower()
 
     latest_tag = get_latest_tag()
     current_v = latest_tag.lstrip("v") if latest_tag else None
 
-    new_v = bump_version(current_v, bump_type, release_status)
+    new_v = bump_version(current_v, b_type, r_status)
 
     update_files(new_v)
 
-    # Write to file for GitHub Actions
-    with open("VERSION.txt", "w") as f:
+    with open("VERSION.txt", "w", encoding="utf-8") as f:
         f.write(new_v)

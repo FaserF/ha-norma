@@ -1,11 +1,17 @@
 """Tests for the Norma Offers & Coupons config flow."""
 
 from unittest.mock import patch
-import pytest
+
 from homeassistant import config_entries, data_entry_flow
 from homeassistant.core import HomeAssistant
 
-from custom_components.norma.const import DOMAIN, CONF_STORE_ID, CONF_ZIP_CODE, CONF_USERNAME, CONF_PASSWORD
+from custom_components.norma.const import (
+    CONF_PASSWORD,
+    CONF_STORE_ID,
+    CONF_USERNAME,
+    CONF_ZIP_CODE,
+    DOMAIN,
+)
 
 
 async def test_flow_user_init(hass: HomeAssistant) -> None:

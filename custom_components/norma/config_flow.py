@@ -6,7 +6,6 @@ import logging
 from typing import Any
 
 import voluptuous as vol
-
 from homeassistant import config_entries
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
@@ -15,9 +14,9 @@ from .api import NormaAPIClient
 from .const import (
     CONF_CITY,
     CONF_PASSWORD,
-    CONF_STREET,
     CONF_STORE_ID,
     CONF_STORE_NAME,
+    CONF_STREET,
     CONF_UPDATE_INTERVAL,
     CONF_USERNAME,
     CONF_ZIP_CODE,

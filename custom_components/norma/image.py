@@ -5,7 +5,6 @@ from __future__ import annotations
 import hashlib
 import io
 import logging
-from typing import Any
 
 from homeassistant.components.image import ImageEntity
 from homeassistant.config_entries import ConfigEntry

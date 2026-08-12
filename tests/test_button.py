@@ -1,11 +1,15 @@
 """Tests for the Norma button platform."""
 
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock
+
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
-from custom_components.norma.const import DOMAIN, CONF_STORE_ID
-from custom_components.norma.button import NormaForceUpdateButton, NormaActivateCouponsButton
+from custom_components.norma.button import (
+    NormaActivateCouponsButton,
+    NormaForceUpdateButton,
+)
+from custom_components.norma.const import CONF_STORE_ID, DOMAIN
 from custom_components.norma.coordinator import NormaDataUpdateCoordinator
 
 

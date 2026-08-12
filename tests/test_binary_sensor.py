@@ -3,8 +3,11 @@
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
-from custom_components.norma.const import DOMAIN, CONF_STORE_ID
-from custom_components.norma.binary_sensor import NormaOffersAvailableBinarySensor, NormaLoginStatusBinarySensor
+from custom_components.norma.binary_sensor import (
+    NormaLoginStatusBinarySensor,
+    NormaOffersAvailableBinarySensor,
+)
+from custom_components.norma.const import CONF_STORE_ID, DOMAIN
 from custom_components.norma.coordinator import NormaDataUpdateCoordinator
 
 

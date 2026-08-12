@@ -1,12 +1,15 @@
 """Tests for the Norma sensor platform."""
 
-from unittest.mock import patch
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
-from custom_components.norma.const import DOMAIN, CONF_STORE_ID
-from custom_components.norma.sensor import NormaOffersSensor, NormaCouponsSensor, NormaValidUntilSensor
+from custom_components.norma.const import CONF_STORE_ID, DOMAIN
 from custom_components.norma.coordinator import NormaDataUpdateCoordinator
+from custom_components.norma.sensor import (
+    NormaCouponsSensor,
+    NormaOffersSensor,
+    NormaValidUntilSensor,
+)
 
 
 async def test_sensors_state(hass: HomeAssistant) -> None:
