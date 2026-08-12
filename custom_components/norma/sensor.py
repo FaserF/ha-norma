@@ -129,3 +129,23 @@ class NormaCouponsSensor(NormaBaseEntity, SensorEntity):
             "coupons": self.coordinator.data.get("coupons", []),
             "is_authenticated": self.coordinator.data.get("is_authenticated", False),
         }
+
+
+class NormaValidUntilSensor(NormaBaseEntity, SensorEntity):
+    """Sensor tracking valid_until date for current offers."""
+
+    _attr_translation_key = "valid_until"
+    _attr_icon = "mdi:calendar-clock"
+
+    def __init__(
+        self, coordinator: NormaDataUpdateCoordinator, entry: ConfigEntry
+    ) -> None:
+        """Initialize valid until sensor."""
+        super().__init__(coordinator, entry, "valid_until")
+
+    @property
+    def native_value(self) -> str | None:
+        """Return valid_until date string."""
+        if not self.coordinator.data:
+            return None
+        return self.coordinator.data.get("valid_until")
