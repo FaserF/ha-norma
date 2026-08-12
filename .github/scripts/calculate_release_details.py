@@ -130,21 +130,19 @@ def main():
 
     # Generate Changelog
     changelog_md = ""
-    if os.path.exists("scripts/generate_changelog.py"):
+    script_path = ".github/scripts/changelog_builder.py"
+    if os.path.exists(script_path):
         try:
+            cmd = [
+                "python",
+                script_path,
+                "--repo-url",
+                f"https://github.com/{repo}",
+            ]
+            if changelog_from:
+                cmd.extend(["--from-tag", changelog_from])
             changelog_md = (
-                subprocess.check_output(
-                    [
-                        "python",
-                        "scripts/generate_changelog.py",
-                        "--from-tag",
-                        changelog_from,
-                        "--total-commits",
-                        str(total_commit_count),
-                        "--repo",
-                        repo,
-                    ]
-                )
+                subprocess.check_output(cmd)
                 .decode("utf-8")
                 .strip()
             )
