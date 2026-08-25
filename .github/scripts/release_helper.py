@@ -217,7 +217,7 @@ def main():
     )
 
     released_at = (
-        datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M") + " UTC"
+        datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%d %H:%M") + " UTC"
     )
     body_parts = [
         f"# Norma Offers & Coupons {version}  {channel_badge}",
