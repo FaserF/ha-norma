@@ -110,7 +110,7 @@ class NormaLoyaltyCardQrImage(
             buf = io.BytesIO()
             img.save(buf, format="PNG")
             return buf.getvalue()
-        except ImportError, ModuleNotFoundError:
+        except (ImportError, ModuleNotFoundError):
             from PIL import Image, ImageDraw
 
             img = Image.new("RGB", (300, 300), "white")

@@ -15,6 +15,7 @@ CONF_UPDATE_INTERVAL: Final = "update_interval"
 CONF_USERNAME: Final = "username"
 CONF_PASSWORD: Final = "password"
 CONF_AUTO_ACTIVATE_COUPONS: Final = "auto_activate_coupons"
+CONF_PRODUCT_FILTERS: Final = "product_filters"
 
 # Account device identifier suffix
 ACCOUNT_KEY_SUFFIX: Final = "_account"

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import re
 from typing import Any
 
 from homeassistant.components.sensor import SensorEntity
@@ -13,10 +14,41 @@ from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import ATTRIBUTION, DOMAIN
+from .const import (
+    ATTR_BASE_PRICE,
+    ATTR_CATEGORY,
+    ATTR_DISCOUNT_PRICE,
+    ATTR_DISCOUNT_TITLE,
+    ATTR_PICTURE,
+    ATTR_VALID_DATE,
+    ATTRIBUTION,
+    DOMAIN,
+)
 from .coordinator import NormaDataUpdateCoordinator
 
 _LOGGER = logging.getLogger(__name__)
+
+
+def _parse_price_value(price_str: Any) -> float:
+    """Parse numeric value from price string for sorting."""
+    if not price_str:
+        return float("inf")
+    cleaned = (
+        str(price_str)
+        .replace("€", "")
+        .replace("EUR", "")
+        .replace("eur", "")
+        .replace("*", "")
+        .strip()
+        .replace(",", ".")
+    )
+    match = re.search(r"\d+(?:\.\d+)?", cleaned)
+    if match:
+        try:
+            return float(match.group(0))
+        except ValueError:
+            return float("inf")
+    return float("inf")
 
 
 async def async_setup_entry(
@@ -30,6 +62,9 @@ async def async_setup_entry(
     entities: list[SensorEntity] = [
         NormaOffersSensor(coordinator, entry),
     ]
+
+    for product_filter in coordinator.product_filters:
+        entities.append(NormaProductFilterSensor(coordinator, entry, product_filter))
 
     if coordinator.has_account:
         entities.extend(
@@ -105,6 +140,97 @@ class NormaOffersSensor(NormaStoreBaseEntity, SensorEntity):
             "discounts": self.coordinator.data.get("discounts", []),
             "valid_until": self.coordinator.data.get("valid_until"),
             "last_updated": self.coordinator.data.get("last_success"),
+            ATTR_ATTRIBUTION: ATTRIBUTION,
+        }
+
+
+class NormaProductFilterSensor(NormaStoreBaseEntity, SensorEntity):
+    """Sensor tracking offers for a specific product search filter."""
+
+    _attr_icon = "mdi:tag-search"
+
+    def __init__(
+        self,
+        coordinator: NormaDataUpdateCoordinator,
+        entry: ConfigEntry,
+        product_filter: str,
+    ) -> None:
+        """Initialize product filter sensor."""
+        super().__init__(
+            coordinator,
+            entry,
+            f"product_filter_{product_filter.lower().replace(' ', '_')}",
+        )
+        self._filter = product_filter
+        self._attr_name = f"Angebot {product_filter}"
+
+    def _get_matches(self) -> list[dict[str, Any]]:
+        """Calculate matching offers from coordinator discounts."""
+        if not self.coordinator.data:
+            return []
+        discounts: list[dict[str, Any]] = self.coordinator.data.get("discounts", [])
+        filter_term = self._filter.lower()
+        matches: list[dict[str, Any]] = []
+        for discount in discounts:
+            title = str(discount.get(ATTR_DISCOUNT_TITLE, "") or "").lower()
+            category = str(discount.get(ATTR_CATEGORY, "") or "").lower()
+            base_price = str(discount.get(ATTR_BASE_PRICE, "") or "").lower()
+            if (
+                filter_term in title
+                or filter_term in category
+                or filter_term in base_price
+            ):
+                matches.append(discount)
+        return matches
+
+    @property
+    def native_value(self) -> str:
+        """Return best price found or 'Nicht im Angebot'."""
+        matches = self._get_matches()
+        if not matches:
+            return "Nicht im Angebot"
+        best = min(
+            matches,
+            key=lambda m: _parse_price_value(m.get(ATTR_DISCOUNT_PRICE)),
+        )
+        return str(best.get(ATTR_DISCOUNT_PRICE) or "Nicht im Angebot")
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        """Return filter matching details and metadata."""
+        matches = self._get_matches()
+        on_sale = bool(matches)
+        best_match = (
+            min(
+                matches,
+                key=lambda m: _parse_price_value(m.get(ATTR_DISCOUNT_PRICE)),
+            )
+            if on_sale
+            else None
+        )
+
+        return {
+            "filter": self._filter,
+            "on_sale": on_sale,
+            "match_count": len(matches),
+            "best_price": best_match.get(ATTR_DISCOUNT_PRICE) if best_match else None,
+            "base_price": best_match.get(ATTR_BASE_PRICE) if best_match else None,
+            "product_title": (
+                best_match.get(ATTR_DISCOUNT_TITLE) if best_match else None
+            ),
+            "category": best_match.get(ATTR_CATEGORY) if best_match else None,
+            "valid_until": (
+                best_match.get(ATTR_VALID_DATE)
+                or (
+                    self.coordinator.data.get("valid_until")
+                    if self.coordinator.data
+                    else None
+                )
+            )
+            if best_match
+            else None,
+            "picture_link": best_match.get(ATTR_PICTURE) if best_match else None,
+            "matches": matches,
             ATTR_ATTRIBUTION: ATTRIBUTION,
         }
 

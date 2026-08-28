@@ -33,6 +33,7 @@ from .const import (
     ATTR_VALID_DATE,
     CONF_AUTO_ACTIVATE_COUPONS,
     CONF_PASSWORD,
+    CONF_PRODUCT_FILTERS,
     CONF_STORE_ID,
     CONF_UPDATE_INTERVAL,
     CONF_USERNAME,
@@ -56,6 +57,7 @@ class NormaDataUpdateCoordinator(DataUpdateCoordinator):
         self.username: str | None = config.get(CONF_USERNAME)
         self.password: str | None = config.get(CONF_PASSWORD)
         self.auto_activate_coupons: bool = config.get(CONF_AUTO_ACTIVATE_COUPONS, False)
+        self.product_filters: list[str] = list(config.get(CONF_PRODUCT_FILTERS, []))
         self.config_entry = entry
 
         # Account device identifiers (mirrors ha-lidl / ha-rewe pattern)
@@ -137,7 +139,7 @@ class NormaDataUpdateCoordinator(DataUpdateCoordinator):
             if "last_success" in cache:
                 try:
                     self._last_success = dt_util.parse_datetime(cache["last_success"])
-                except ValueError, TypeError:
+                except (ValueError, TypeError):
                     self._last_success = None
         else:
             _LOGGER.debug("No cached Norma data found for store %s", self.store_id)

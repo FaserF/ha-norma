@@ -93,7 +93,8 @@ async def test_options_flow(hass: HomeAssistant) -> None:
 
     result_save = await hass.config_entries.options.async_configure(
         result["flow_id"],
-        user_input={"update_interval": 14},
+        user_input={"update_interval": 14, "product_filters": ["Milch", "Butter"]},
     )
     assert result_save["type"] == data_entry_flow.FlowResultType.CREATE_ENTRY
     assert result_save["data"]["update_interval"] == 14
+    assert result_save["data"]["product_filters"] == ["Milch", "Butter"]

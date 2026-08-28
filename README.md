@@ -20,6 +20,22 @@
 ### Why use this integration?
 Instead of scraping HTML or using broken workarounds, this integration connects to NORMA endpoints using `curl_cffi` for realistic browser impersonation. It fetches structured weekly offers data, valid dates, and optionally authenticates with your user account to track active coupons.
 
+---
+
+### 🛒 Supermarket Family & Deals Hub
+
+Check out our full collection of Home Assistant supermarket integrations and the multi-store aggregator:
+
+| Repository | Description |
+| :--- | :--- |
+| 🏷️ [**Grocery Deals (ha-grocery-deals)**](https://github.com/FaserF/ha-grocery-deals) | **Smart multi-store price comparison hub (aggregates all 5 integrations)** |
+| 🔴 [**ha-rewe**](https://github.com/FaserF/ha-rewe) | REWE weekly offers, bonus points, coupons & product filters |
+| 🟡 [**ha-edeka**](https://github.com/FaserF/ha-edeka) | EDEKA weekly offers, discounts & PAYBACK card |
+| 🔵 [**ha-lidl**](https://github.com/FaserF/ha-lidl) | Lidl Plus weekly offers, coupons & digital receipts |
+| ⚪ [**ha-aldi**](https://github.com/FaserF/ha-aldi) | ALDI Süd & ALDI Nord weekly flyers & brochures |
+
+---
+
 It groups all sensors under a single NORMA store device and implements advanced lock-serialisation, random jitter delays, and backoffs to prevent rate limits and anti-bot bans.
 
 ## ✨ Features
@@ -93,13 +109,6 @@ You can customize the update interval:
 1. Go to **Settings > Devices & Services**.
 2. Find **NORMA Offers & Coupons** and click **Configure**.
 3. Set the **Update Interval** in hours (default is 24 hours, minimum is 12 hours).
-
-## 🛒 Other Supermarket Integrations
-
-- [REWE Discounts](https://github.com/FaserF/ha-rewe)
-- [Lidl Offers](https://github.com/FaserF/ha-lidl)
-- [EDEKA Offers](https://github.com/FaserF/ha-edeka)
-- [Aldi Offers](https://github.com/FaserF/ha-aldi)
 
 ## 📄 License
 

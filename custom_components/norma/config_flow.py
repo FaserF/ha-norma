@@ -8,12 +8,18 @@ from typing import Any
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.core import callback
+from homeassistant.helpers.selector import (
+    SelectSelector,
+    SelectSelectorConfig,
+    SelectSelectorMode,
+)
 
 from .api import NormaAPIClient
 from .const import (
     CONF_AUTO_ACTIVATE_COUPONS,
     CONF_CITY,
     CONF_PASSWORD,
+    CONF_PRODUCT_FILTERS,
     CONF_STORE_ID,
     CONF_STORE_NAME,
     CONF_STREET,
@@ -158,7 +164,7 @@ class NormaOptionsFlowHandler(config_entries.OptionsFlow):
                     title="", data=self._config_entry.options
                 )
 
-            # action == "save": persist update_interval
+            # action == "save": persist update_interval and product_filters
             new_options = {
                 **self._config_entry.options,
                 CONF_UPDATE_INTERVAL: user_input.get(
@@ -167,6 +173,7 @@ class NormaOptionsFlowHandler(config_entries.OptionsFlow):
                 CONF_AUTO_ACTIVATE_COUPONS: user_input.get(
                     CONF_AUTO_ACTIVATE_COUPONS, False
                 ),
+                CONF_PRODUCT_FILTERS: user_input.get(CONF_PRODUCT_FILTERS, []),
             }
             return self.async_create_entry(title="", data=new_options)
 
@@ -176,6 +183,12 @@ class NormaOptionsFlowHandler(config_entries.OptionsFlow):
         current_auto_activate = self._config_entry.options.get(
             CONF_AUTO_ACTIVATE_COUPONS, False
         )
+        current_product_filters = self._config_entry.options.get(
+            CONF_PRODUCT_FILTERS, []
+        )
+        if not isinstance(current_product_filters, list):
+            current_product_filters = []
+
         has_account = bool(
             self._config_entry.data.get(CONF_USERNAME)
             and self._config_entry.data.get(CONF_PASSWORD)
@@ -192,6 +205,16 @@ class NormaOptionsFlowHandler(config_entries.OptionsFlow):
                 vol.Optional(
                     CONF_AUTO_ACTIVATE_COUPONS, default=current_auto_activate
                 ): bool,
+                vol.Optional(
+                    CONF_PRODUCT_FILTERS, default=current_product_filters
+                ): SelectSelector(
+                    SelectSelectorConfig(
+                        options=current_product_filters,
+                        multiple=True,
+                        custom_value=True,
+                        mode=SelectSelectorMode.DROPDOWN,
+                    )
+                ),
                 vol.Required("action", default="save"): vol.In(action_choices),
             }
         )
