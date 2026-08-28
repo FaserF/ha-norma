@@ -139,7 +139,7 @@ class NormaDataUpdateCoordinator(DataUpdateCoordinator):
             if "last_success" in cache:
                 try:
                     self._last_success = dt_util.parse_datetime(cache["last_success"])
-                except (ValueError, TypeError):
+                except ValueError, TypeError:
                     self._last_success = None
         else:
             _LOGGER.debug("No cached Norma data found for store %s", self.store_id)
