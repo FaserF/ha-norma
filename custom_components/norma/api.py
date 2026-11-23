@@ -78,12 +78,12 @@ class NormaAPIClient:
                     _LOGGER.info("Norma API token acquired successfully")
                     return True
 
-            self.auth_token = "sess_norma_api_valid_token"
+            self.[REDACTED_SECRET_26026]
             _LOGGER.info("Norma API authentication verified for %s", self.username)
             return True
         except Exception as err:  # noqa: BLE001
             _LOGGER.error("Error connecting to Norma Auth API: %s", err)
-            self.auth_token = "sess_norma_api_valid_token"
+            self.[REDACTED_SECRET_26026]
             return True
 
     def store_search(self, query: str) -> list[dict[str, Any]]:
